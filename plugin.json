@@ -1,0 +1,49 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "spaicely",
+  "version": "1.2.0",
+  "description": "Build, publish and host static websites on your own domain with Spaicely: the MCP server plus guides for building and running sites and finding a domain name.",
+  "author": {
+    "name": "Spaicely",
+    "email": "support@spaicely.com",
+    "url": "https://spaicely.com"
+  },
+  "homepage": "https://spaicely.com/developers/",
+  "repository": "https://github.com/spaicely/agent-plugins",
+  "license": "MIT",
+  "keywords": [
+    "hosting",
+    "static site",
+    "domains",
+    "mcp",
+    "eu"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Spaicely",
+        "shortDescription": "Host static sites on your own domain",
+        "longDescription": "Spaicely hosts static websites on your own domain in the EU. Your AI builds the site, publishes it, connects the domain and adds forms, while you stay in charge of every change.",
+        "developerName": "Spaicely",
+        "category": "Productivity",
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
+        "websiteURL": "https://spaicely.com/en-gb/",
+        "supportURL": "https://spaicely.com/developers/",
+        "privacyPolicyURL": "https://spaicely.com/en-gb/privacy/",
+        "termsOfServiceURL": "https://spaicely.com/en-gb/terms/",
+        "defaultPrompt": [
+          "Build a one-page site for my bakery and put it online.",
+          "Check my site before launch.",
+          "Connect my domain to my site."
+        ],
+        "brandColor": "#1E2A78",
+        "brandColorDark": "#AEB7FF",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/icon.png"
+      }
+    }
+  }
+}

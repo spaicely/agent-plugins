@@ -1,11 +1,21 @@
 {
   "name": "spaicely",
   "displayName": "Spaicely",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Build, publish and host static websites on your own domain with Spaicely: the MCP server plus guides for building and running sites and finding a domain name.",
-  "author": { "name": "Spaicely", "email": "support@spaicely.com", "url": "https://spaicely.com" },
+  "author": {
+    "name": "Spaicely",
+    "email": "support@spaicely.com",
+    "url": "https://spaicely.com"
+  },
   "homepage": "https://spaicely.com/developers/",
-  "repository": "https://github.com/spaicely/claude-plugin",
+  "repository": "https://github.com/spaicely/agent-plugins",
   "license": "MIT",
-  "keywords": ["hosting", "static site", "domains", "mcp", "eu"]
+  "keywords": [
+    "hosting",
+    "static site",
+    "domains",
+    "mcp",
+    "eu"
+  ]
 }
