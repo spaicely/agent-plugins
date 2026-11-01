@@ -1,6 +1,6 @@
 ---
 name: site-building
-description: Build a static website for Spaicely that is easy to find, share and use, with sitemap.xml, robots.txt, llms.txt, link previews for social media, structured data and icons. Use whenever you build or rework a site that will be hosted on Spaicely.
+description: Build a static website for Spaicely that is easy to find, share and use, with sitemap.xml, robots.txt, llms.txt, link previews for social media, structured data and icons. Use whenever you build or rework a site that will be hosted on Spaicely, also when you move an existing site (WordPress, Wix, Squarespace) to Spaicely.
 ---
 
 # Building a site that people and machines can find
@@ -290,6 +290,18 @@ Good to know:
 - The owner gets a mail for every paid order with the products and the delivery address; `shop.orders` lists the orders. Stripe sends the buyer the receipt.
 - Make a thank-you page (`success_url`, `noindex`) and say on the privacy page that Stripe handles the payment.
 - The owner is the seller. Make a page with the person about delivery, shipping costs, returns and the 14-day right of withdrawal for consumers (with the model form), plus the business details (name, address, registration and VAT number), and link it in the footer and at checkout. The owner refunds in their Stripe dashboard; Spaicely's commission is not returned then.
+
+## Moving an existing site (WordPress and others)
+
+A person who has a site elsewhere can have you rebuild it here: the same pages and addresses, as plain fast HTML, without plugins or updates. Only move a site the person owns or may move.
+
+1. **Take stock.** Read the sitemap (`/wp-sitemap.xml`, `/sitemap_index.xml` or `/sitemap.xml`). On WordPress the REST API usually gives everything: `/wp-json/wp/v2/pages?per_page=100`, `/posts`, `/media` and `/categories` (page through with `&page=2`). Per page you get `link`, `title`, `content.rendered` and, with Yoast or Rank Math, `yoast_head_json` with the title and description for search engines. Is the API switched off, then read the pages themselves, or ask the person for an export (WordPress: Tools > Export, an XML file). Make a list of every address and show it to the person before you build.
+2. **Rebuild, do not copy.** Take the text, headings, images and links from each page and write clean HTML in a theme in the style of the old site (or a new style, if the person wants one). Leave out shortcodes, page-builder markup, plugin scripts and tracking. Keep each page's title and description.
+3. **Images.** Pass the files from `wp-content/uploads/` as `source_url` in `sites.deploy` (at most 20 per call); Spaicely fetches and shrinks them. Take the original, not a thumbnail, and keep the alt texts.
+4. **Keep the addresses.** `/about-us/` becomes `about-us/index.html`, so links and search results keep working. What does change goes in `_redirects` with 301 (see Redirects). WordPress addresses that no longer exist (`/category/*`, `/tag/*`, `/author/*`, `/feed/`, `/?p=123`) go to the nearest page.
+5. **What a plugin did.** Contact forms (Contact Form 7, WPForms, Gravity Forms) become a contact form, a newsletter becomes a signup form (see Forms). WooCommerce becomes a web shop on the Shop plan (see Web shop). A blog becomes a page per post plus an overview page. Comments, search and logins do not come along: say so, and keep existing comments as text if the person wants that.
+6. **Show it before switching.** Publish, and let the person check the site at its own address (`https://<label>.spaicely.site`, once the hosting is paid). Go over it with the prompt `launch_check`.
+7. **Then the domain.** `sites.domains.connect` reads the domain's current DNS records and takes over the ones the person keeps, mail (MX, SPF, DKIM) in particular, so mail keeps working. Only after the site works on its own domain can the old hosting be cancelled. The domain itself can move to Spaicely too, with `domains.transfer`, but it does not have to.
 
 ## Privacy and cookies
 
