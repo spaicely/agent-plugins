@@ -20,7 +20,7 @@ How a site gets online and stays there. For what a good site contains, see the s
 A version is always the whole site, never a set of changes. Nothing is visible until it is published.
 
 1. **Upload**, one of two ways:
-   - `sites.deploy` with every file: `path` from the site root, `sha256` in hex and `size` in bytes. For an image that is already on the web, pass `source_url` instead (https, at most 20 per call). The answer lists `missing`; send exactly those with `sites.files.put` (at most 50 files and 2 MB per call, text as `utf8`, the rest as `base64`).
+   - `sites.deploy` with every file: `path` from the site root, `sha256` in hex and `size` in bytes. For an image that is already on the web, pass `source_url` instead (https, at most 20 per call). Cannot compute a sha256 (no code execution)? Pass `content` instead, with `encoding` `utf8` for text or `base64` for images, at most 2 MB of content per call; such a file is never `missing`. For unchanged files of a live site, copy `sha256` and `size` from `sites.files.list`. The answer lists `missing`; send exactly those with `sites.files.put` (at most 50 files and 2 MB per call, text as `utf8`, the rest as `base64`).
    - With the site as a folder on disk: `sites.upload_url`, then `tar -czf site.tar.gz -C <folder> . && curl -T site.tar.gz <url>`. The URL works once, for 10 minutes; `index.html` must be at the root of the archive.
 2. **Publish** with `sites.publish` and the version number, after the person agreed. Visitors switch over at once, never to a mix. It takes up to half a minute; `sites.versions` shows when it is live.
 3. **Read the report.** `sites.versions` gives per version the bytes saved and `hints`, each with a `fix`. Fix what applies and publish again.
