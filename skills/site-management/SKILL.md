@@ -13,6 +13,7 @@ How a site gets online and stays there. For what a good site contains, see the s
 - Your rights are never wider than the person's role. When a tool refuses, say what is missing (role, scope or plan) instead of trying another way.
 - A tool named here that is not in your list means your list is old: ask the person to reconnect the Spaicely connector (in claude.ai: Settings > Connectors; in Claude Code: `/mcp`).
 - Ask the person before anything that changes what visitors see, costs money or cannot be undone. Some tools ask for approval themselves in Claude Code.
+- **What you may do yourself** is the person's choice, per kind of action (`ai_permissions` in `account.whoami`): `self`, `ask` or `never`. By default buying, people, mail, the registry, deleting and billing details are `ask`. Such a call answers with `approval_required` and a `url`: give the person that link and do not repeat the call. They approve in Spaicely; we then run the call exactly as you sent it, and `approvals.status` with the `approval` id gives its answer. A `never` kind is refused; only the person can change that, at https://app.spaicely.com/ai.
 
 ## Putting a version online
 
