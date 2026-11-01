@@ -6,6 +6,7 @@ This plugin gives Claude Code:
 
 - the Spaicely MCP server (`https://mcp.spaicely.com/mcp`); you sign in on first use;
 - the guide `site-building`, with everything a site needs to be found and shared;
+- the guide `site-management`, for running a site once it is built: versions and rollback, the domain and DNS, mail forwarding, people and roles, the hosting plan;
 - the guide `domain-search`, for finding a free domain name together.
 
 ## Install

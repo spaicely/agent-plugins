@@ -302,3 +302,9 @@ Good to know:
 - Read the `hints` in `sites.versions` and fix what applies.
 - Suggest that the person adds the domain to Google Search Console and Bing Webmaster Tools and submits the sitemap there. Both verify a domain with a TXT record, which you can set with `domains.dns.update`.
 - After a big change, update `lastmod` in the sitemap for the pages that changed.
+
+## More
+
+- Uploading, publishing and rolling back, changing one block of a page, putting the site on its domain, DNS, mail forwarding, people and roles, the hosting plan: the skill `site-management`, https://spaicely.com/skills/en/site-management/SKILL.md.
+- Every tool, parameter and HTTP endpoint: https://spaicely.com/developers/, and for AIs https://spaicely.com/llms-full.txt.
+- A tool named there that is not in your list means your list is old: ask the person to reconnect the Spaicely connector, which loads the current one.

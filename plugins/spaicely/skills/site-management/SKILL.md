@@ -1,0 +1,103 @@
+---
+name: site-management
+description: Run a site on Spaicely after it is built - upload and publish versions, roll back, change part of a page, put the site on its domain, manage DNS and mail forwarding, people and roles, approvals, handovers, the hosting plan and domain renewals. Use whenever you work on an existing Spaicely site or account, not only when building one.
+---
+
+# Running a site on Spaicely
+
+How a site gets online and stays there. For what a good site contains, see the skill `site-building`; for finding a name, `domain-search`. Every tool, parameter and HTTP endpoint is listed at https://spaicely.com/developers/ and, for AIs, in https://spaicely.com/llms-full.txt.
+
+## Start
+
+- Call `account.whoami` first. It says who you act for, your scopes, and per site your role and what you may do. With no site yet, `sites.create` makes one; ask the person for the name.
+- Your rights are never wider than the person's role. When a tool refuses, say what is missing (role, scope or plan) instead of trying another way.
+- A tool named here that is not in your list means your list is old: ask the person to reconnect the Spaicely connector (in claude.ai: Settings > Connectors; in Claude Code: `/mcp`).
+- Ask the person before anything that changes what visitors see, costs money or cannot be undone. Some tools ask for approval themselves in Claude Code.
+
+## Putting a version online
+
+A version is always the whole site, never a set of changes. Nothing is visible until it is published.
+
+1. **Upload**, one of two ways:
+   - `sites.deploy` with every file: `path` from the site root, `sha256` in hex and `size` in bytes. For an image that is already on the web, pass `source_url` instead (https, at most 20 per call). The answer lists `missing`; send exactly those with `sites.files.put` (at most 50 files and 2 MB per call, text as `utf8`, the rest as `base64`).
+   - With the site as a folder on disk: `sites.upload_url`, then `tar -czf site.tar.gz -C <folder> . && curl -T site.tar.gz <url>`. The URL works once, for 10 minutes; `index.html` must be at the root of the archive.
+2. **Publish** with `sites.publish` and the version number, after the person agreed. Visitors switch over at once, never to a mix. It takes up to half a minute; `sites.versions` shows when it is live.
+3. **Read the report.** `sites.versions` gives per version the bytes saved and `hints`, each with a `fix`. Fix what applies and publish again.
+
+Good to know:
+
+- We keep the files exactly as uploaded; visitors get an optimised copy (minified HTML, CSS and JavaScript, recompressed images up to 2560 pixels).
+- Everything under `_private/` stays off the CDN; only a download form hands it out. `_redirects` becomes redirects at the CDN and is not served itself (see `site-building`).
+- Did someone else publish after your version started? Then your changes are merged onto theirs and that goes live. A conflict comes back per path: read the live file with `sites.files.get`, redo your change on it, and upload again.
+- **Back to the previous version**: `sites.publish` with `rollback: true`. Any older version: `sites.publish` with its number.
+- Before you change a page someone else made, read it with `sites.files.get` (the live version, or `deployment` for another one) and keep what is there. `sites.files.list` shows the files, with `prefix` for one folder.
+
+## Changing one part of a page
+
+A page can mark blocks that a role may change on its own:
+
+```html
+<!-- spaicely:edit news -->
+<p>Open on Sunday from 1 November.</p>
+<!-- /spaicely:edit -->
+
+<!-- spaicely:append agenda -->
+<li>12 November: tasting</li>
+<!-- /spaicely:append -->
+```
+
+- `edit` may be changed entirely; `append` only takes additions before or after what is there. Names: lower case letters, digits, `-` and `_`. Blocks do not nest.
+- `sites.files.list` lists the blocks per page. `sites.region.update` with `path`, `region` and `content` makes a new version that differs from live in that block only (`mode` replace, prepend or append; `index` when a name occurs more than once). Then publish.
+- Build these markers in where the person expects others to keep things up to date (news, opening hours, agenda), so an editor never needs the whole page.
+
+## People and roles
+
+- **On the whole account**: `account.members`. Owners handle payment, domains and people; members work on all sites. Invite by e-mail (the link works 7 days).
+- **On one site**: `access.list` shows who has which role; `access.update` gives, changes or (`role: "none"`) removes one. Only the owner. The person needs a Spaicely login with that address.
+- Roles: `admin` (everything but owner matters), `maintainer` (all files, forms and DNS), `designer` and `editor` (only what their `rules` allow), `viewer` (reading). `can_publish` lets a maintainer or editor publish.
+- Rules limit a designer or editor to actions on paths, optionally to marked blocks: `[{"actions": ["update"], "paths": ["blog/**", "index.html"], "regions": ["news"]}]`.
+- **Approval** (plans Pro and Shop): someone who may change files but not publish calls `sites.review.request` with a `note`. Whoever may publish gets a mail; approving is `sites.publish`, sending back is `sites.review.reject` with a note. On plan Site the person asks someone who may publish.
+
+## A domain for the site
+
+- Registering or moving a domain: see `domain-search` (`domains.register`, `domains.transfer`; a partner proposes one to the customer with `domains.propose`). The customer is always the holder.
+- **Connecting**: `sites.domains.connect` with the domain itself, no www. Spaicely reads the records the domain has now; call again after about half a minute for `records_to_confirm`. Show them to the person: kept records (mail, verifications) come along, records with reason `site` are replaced, reason `certificate` is a CAA record that would block the certificate. Then call with `confirm: true` (`skip` with the indexes to leave out).
+- The person then sets the nameservers at their registrar to the two in the answer (`kiki.bunny.net` and `coco.bunny.net`). Domains registered at Spaicely have them already. DNSSEC at the old provider must be off first. We check every five minutes, then fetch the certificate and mail the person; `www` sends visitors on to the domain itself.
+- `domains.status` shows where it stands: records to confirm, nameservers, DNSSEC, certificate, and the records we serve.
+- **DNS records**: `domains.dns.update` adds or deletes A, AAAA, CNAME, TXT, MX, SRV and CAA (`name` relative to the domain, `@` for the domain itself; delete by id from `domains.status`). Where the domain and www point stays with the site. A domain of the account on no site gets Spaicely DNS this way too.
+- Mail signing keys (DKIM) of an unusual service can be missed when connecting: the person sends one mail from an address on the domain to `dkim@spaicely.com` with the code from `dkim_mail` as the subject.
+- `sites.domains.disconnect` stops the site answering on the domain; mail records stay.
+
+## Mail forwarding
+
+Mail to `info@<domain>` can go on to a mailbox the person already has, such as their Gmail. Answering as `info@` is not possible yet.
+
+1. `mail.forward.enable` on a domain connected to a paid site. It sets MX, verification, DKIM, SPF and DMARC. If the domain already receives mail elsewhere, that stops: the call refuses without `replace_existing_mail: true`, so ask first.
+2. `mail.forward.add` with `address` (`info`, or `*` for every address without one of its own) and up to 5 `destinations`. Each new destination gets a confirmation mail; nothing goes there before it is clicked.
+3. `mail.forward.status` shows the addresses, the state of each destination and mail held back as possible spam in the last 30 days; `mail.forward.release` sends one on after all, only when the person recognises it.
+
+Each address costs EUR 1.50 a month excl. VAT on the site's plan; Site allows 1, Pro 5, Shop 10. `mail.forward.remove` and `mail.forward.disable` stop it.
+
+## Plan, billing and renewals
+
+- **Hosting**: `sites.subscription` shows plan, status and renewal date. With `plan` (`site`, `pro` or `shop`; EUR 5, 12 and 25 a month excl. VAT) it starts hosting, giving a `checkout_url` for the person, or switches plan at once. Without a plan a new site is removed after 14 days. Card, invoices and cancelling are at `portal_url`. Only owners of the paying account.
+- **Billing details**: `account.billing` (business or not, VAT number, address). Every purchase needs them; a VAT number is checked with VIES. `account.invoices` lists our invoices with a link each.
+- **Consumers** (an account that is not a business) must agree that an order starts at once, which limits their right of withdrawal. Pass `start_now: true` only when they said so themselves.
+- **Domains**: renewal is automatic by default, charged 14 days before expiry to the card or mandate the domain was paid with (`domains.auto_renew`; without a saved method the answer has a `setup_url`). `domains.renew` gives a payment link to renew now.
+- Also for owners of the holder account: `domains.holder` (holder details; another name or organisation goes through our staff), `domains.lock` (transfer lock), `domains.nameservers` (`ours: true`, or others for a domain on no site) and `domains.transfer_code` (the code goes by mail to the person and the holder, never to you).
+
+## Partners
+
+- A partner (a web designer or agency) builds on its own partner account, or works on the customer's site with a role.
+- `sites.handover` mails the customer a link (14 days) to take a finished site onto their own account; `role` is what the partner keeps, `payer` who pays from then on. `sites.handover.revoke` takes it back before acceptance.
+- `domains.propose` proposes a domain for a customer's site; the customer checks the holder details and agrees by mail first.
+
+## Keeping an eye on it
+
+- `sites.stats` gives requests, bytes, `not_found` and CDN regions per day, over 7, 30 or 90 days, without cookies. Many `not_found` means broken links: find them and add a redirect or fix the link.
+- `scripts.list` shows the state of every form; `shop.orders` the latest orders.
+- Deleting a site (`sites.delete`, owner only, with the name the person typed) takes every version, form and the shop offline for good. The domains stay theirs.
+
+## Without MCP
+
+The Spaicely CLI does the same from a terminal or CI: `spaicely login`, `spaicely deploy` (diff with live, upload, optionally publish), `spaicely publish`, `spaicely rollback`, `spaicely versions`, `spaicely domains ...`, `spaicely dns ...`, and `spaicely call <tool>` for every other tool. Install and examples: https://spaicely.com/developers/#command-line.
