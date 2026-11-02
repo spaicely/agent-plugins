@@ -237,7 +237,7 @@ Good to know:
 On the Shop plan a site sells by itself. The buyer pays through Stripe Checkout, straight to the owner; Spaicely keeps 2% commission. No shop system is needed: the products are in one file.
 
 1. **Link Stripe.** The account owner links their own Stripe account once. `shop.setup` gives the `connect_url` for that; send the person there. Until that is done the status is `waiting_for_stripe`.
-2. **Products in `data/products.json`.** Prices in cents, including VAT. `id` is unique and does not change; `active: false` takes a product off sale without removing it. Without `shipping` Checkout asks no address (services, digital products).
+2. **Products in `data/products.json`.** Prices in cents, including VAT. `id` is unique and does not change; `active: false` takes a product off sale without removing it. Without `shipping` Checkout asks no address (services, digital products). Spaicely reads only `id`, `name`, `price`, `image`, `active` and `variants`; every other key (description, colours, material, related products, categories) is the site's own, so put in whatever the pages need.
 
 ```json
 {
@@ -251,8 +251,27 @@ On the Shop plan a site sells by itself. The buyer pays through Stripe Checkout,
 }
 ```
 
+Sizes and colours are **variants**: each variant has its own `id`, and that is what the buyer buys; `options` describe it, and `price`, `image` or `name` only when they differ from the product (otherwise the name becomes "Shirt (M / blue)"). A product with variants is not bought by its own id. A large catalog goes in **parts**: `parts` in `data/products.json` lists more files, each `{ "products": [...] }` and at most 20 MB, and an id appears only once across all files. A shop sells up to 500 products (variants do not count). Pages then never load the whole catalog: `items_url` from `shop.setup` gives the name, price and stock of only the ids a page needs.
+
+```json
+{
+  "parts": ["data/products/shirts.json", "data/products/mugs.json"],
+  "shipping": [ { "id": "nl", "name": "...", "price": 495, "countries": ["NL", "BE"] } ]
+}
+```
+
+```json
+{ "products": [
+  { "id": "shirt", "name": "Shirt", "price": 2500, "image": "/img/shirt.jpg", "material": "...", "related": ["mug-blue"],
+    "variants": [
+      { "id": "shirt-m-blue", "options": { "size": "M", "colour": "blue" } },
+      { "id": "shirt-xl-blue", "options": { "size": "XL", "colour": "blue" }, "price": 2700 }
+    ] }
+] }
+```
+
 3. **Publish and switch on** with `shop.setup` (`site_id`, and where it fits `success_url`, `cancel_url` on the site's own domain, `notify_email`). The answer gives the status, what is still missing (`problems`), the `endpoint` and a `snippet`: a buy button as a plain form.
-4. **A cart**: use the building block `cart` (buttons with `data-cart-add`, a counter, the cart with a shipping choice and checkout; names and prices from `data/products.json`). Or write it yourself: keep it in the browser (`localStorage`) and send it with `fetch`; the answer is `{"url": ...}` to go to Stripe, or `{"error": ..., "message": ...}` with a text for the visitor:
+4. **A cart**: use the building block `cart` (buttons with `data-cart-add`, a counter, the cart with a shipping choice and checkout; names, prices and stock through `items_url`, only for the ids on the page; for a size or colour the button takes the variant's id from a select with `data-cart-from`). Or write it yourself: keep it in the browser (`localStorage`) and send it with `fetch`; the answer is `{"url": ...}` to go to Stripe, or `{"error": ..., "message": ...}` with a text for the visitor:
 
 ```html
 <script>
@@ -271,6 +290,7 @@ On the Shop plan a site sells by itself. The buyer pays through Stripe Checkout,
 Good to know:
 
 - Prices always come from the live `data/products.json`, never from the page. When you change a price, publish the pages that show it too.
+- **Stock** is kept by Spaicely, not in the products file: `shop.stock` sets it per id (`set` with `quantity` and optionally `alert_at`, `add` for a delivery or a count), and the owner can do the same on the shop page or with a CSV. An id without stock never runs out. Checkout holds the items for 30 minutes; paying takes them off, an expired checkout gives them back. When something has run out, checkout refuses with `out_of_stock` and `available`; the `cart` block shows it. The owner gets a mail when an id comes down to `alert_at` and when it is sold out.
 - Ordering only works from the site's connected domain (and www) or its address; up to 50 lines, 1 to 99 of each product.
 - The owner gets a mail for every paid order with the products and the delivery address; `shop.orders` lists the orders. Stripe sends the buyer the receipt.
 - Make a thank-you page (`success_url`, `noindex`) and say on the privacy page that Stripe handles the payment.
