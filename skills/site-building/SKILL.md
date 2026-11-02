@@ -128,7 +128,7 @@ Describe the business in JSON-LD on the home page, so search engines can show th
 </script>
 ```
 
-Blog posts get `Article` (with `datePublished` and `author`), products `Product` with `offers`, events `Event`. Only mark up what the visitor can also read on the page.
+Blog posts get `Article` (with `datePublished` and `author`), products `Product` with `offers`, events `Event`. Only mark up what the visitor can also read on the page. The building block `faq` has FAQPage data in its snippet, and `hours` gives an opening-hours table that also says whether the place is open now; keep that table and `openingHoursSpecification` the same.
 
 ## Redirects
 
@@ -158,7 +158,7 @@ When the site comes from another platform, or an address changes, send the old a
 <link rel="alternate" hreflang="x-default" href="https://bakkerijjansen.nl/taarten/">
 ```
 
-- A visible language switch with links, never an automatic redirect on the browser language.
+- A visible language switch with links, never an automatic redirect on the browser language. The building block `language` does this, and offers the visitor's language once.
 - `og:locale` per language; the sitemap lists every version.
 
 ## Fast, readable, usable
@@ -166,6 +166,7 @@ When the site comes from another platform, or an address changes, send the old a
 - Semantic HTML: `header`, `nav`, `main`, `footer`, one `h1` per page, headings in order.
 - Every `img` has `alt` (empty, `alt=""`, for decoration) and `width` and `height`. Images below the first screen get `loading="lazy"`. Use WebP or AVIF and size photos to how they are shown, at most twice that for sharp screens.
 - Little JavaScript; the site should work without it. No frameworks for a site of a few pages.
+- A menu that folds behind a button on a phone: use the building block `nav`.
 - Fonts on the site itself (`.woff2`, `font-display: swap`), not from Google Fonts' servers: loading them from Google sends the visitor's IP address to Google, for which a German court awarded damages in 2022.
 - Enough contrast, visible focus, links that say where they go, a phone number as `tel:` link, an address with a link to a map.
 - Spaicely already minifies HTML, CSS and JavaScript and recompresses JPEG and PNG on publish. It does not convert images to other formats.
@@ -218,7 +219,7 @@ A static site can still take messages and signups. Spaicely handles them on `htt
 
 - `donation_amounts` in cents for the buttons (default 10, 25 and 50 euros), `donation_min_cents` and `donation_max_cents` for the range, `goal_cents` for a goal and `ends_at` for the last day (after it the form takes nothing more). There is no withdrawal checkbox: nothing is delivered.
 - The form posts `amount` (a button) or `amount_other` (typed), `name`, `email`, `message` and `show_name`. Only with `show_name` do name and message appear in the progress.
-- For a progress bar: `fetch(progress_url)` gives `{"raised_cents", "donors", "goal_cents", "ends_at", "open", "donations": [{"name", "message", "at"}]}`, open to any origin and fresh within a minute. Show the bar as a percentage of `goal_cents`, and say clearly on the page what the money is for and that it goes to the owner also when the goal is not reached.
+- For a progress bar: `fetch(progress_url)` gives `{"raised_cents", "donors", "goal_cents", "ends_at", "open", "donations": [{"name", "message", "at"}]}`, open to any origin and fresh within a minute. Show the bar as a percentage of `goal_cents`, and say clearly on the page what the money is for and that it goes to the owner also when the goal is not reached. The building block `donation` does this already: put the `progress_url` in `data-donation` and the texts in the language of the page.
 - Not for investments, loans or rewards in money; that needs a licence. Gifts in return (a mention, a postcard) are fine.
 
 Good to know:
@@ -251,7 +252,7 @@ On the Shop plan a site sells by itself. The buyer pays through Stripe Checkout,
 ```
 
 3. **Publish and switch on** with `shop.setup` (`site_id`, and where it fits `success_url`, `cancel_url` on the site's own domain, `notify_email`). The answer gives the status, what is still missing (`problems`), the `endpoint` and a `snippet`: a buy button as a plain form.
-4. **A cart** lives in the browser (`localStorage`) and is sent with `fetch`; the answer is `{"url": ...}` to go to Stripe, or `{"error": ..., "message": ...}` with a text for the visitor:
+4. **A cart**: use the building block `cart` (buttons with `data-cart-add`, a counter, the cart with a shipping choice and checkout; names and prices from `data/products.json`). Or write it yourself: keep it in the browser (`localStorage`) and send it with `fetch`; the answer is `{"url": ...}` to go to Stripe, or `{"error": ..., "message": ...}` with a text for the visitor:
 
 ```html
 <script>
