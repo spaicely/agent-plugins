@@ -305,8 +305,119 @@ A person who has a site elsewhere can have you rebuild it here: the same pages a
 
 ## Privacy and cookies
 
-- No tracking without consent. Analytics or embedded videos, maps and social media posts that set cookies need a cookie banner that asks first, with refusing as easy as accepting. Better: a privacy-friendly analytics tool without cookies, a video thumbnail that loads the player on click, and a link to the map instead of an embed.
 - A privacy page whenever the site collects anything: what, why, how long, who to ask. Business sites in the EU also show the company name, address, chamber of commerce and VAT number (in Germany and Austria on an `Impressum` page).
+- No tracking without consent. Analytics, advertising pixels and embedded videos, maps and social media posts that set cookies may load only after the visitor agrees, and refusing must be as easy as accepting. Where you can, avoid the need: a video thumbnail that loads the player on click, a link to the map instead of an embed.
+
+### Analytics and other tags
+
+Ask first whether the person needs them. `sites.stats` already counts requests per day without cookies; that is not visitor analytics, but for many small sites it is enough. If they want Google Analytics, Google Tag Manager, a Meta, LinkedIn or TikTok pixel, Hotjar or Clarity, ask for the ID (`G-...`, `GTM-...`, the pixel number); never make one up.
+
+Spaicely does not add anything to your pages. A static site has no shared template, so:
+
+- A tag goes on **every** page, `404.html` included, in the same place. When you add a page later, copy it along.
+- Every tag waits for consent: write it as `<script type="text/plain" data-consent>`. Browsers skip such a script; `consent.js` below turns it on once the visitor accepts. Leave out the `<noscript>` image or iframe that some snippets include: it would load without consent.
+- With Google Tag Manager only the container waits for consent; tags inside it then load after it.
+
+Google Analytics, in the `<head>` of every page:
+
+```html
+<script type="text/plain" data-consent async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script type="text/plain" data-consent>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+```
+
+A Meta, LinkedIn or other pixel: its own snippet, with the opening `<script>` changed to `<script type="text/plain" data-consent>`.
+
+Before `</body>` of every page, with texts in the language of the page:
+
+```html
+<script src="/consent.js" defer
+  data-message="We use cookies to see how the site is used."
+  data-accept="Accept" data-reject="Reject"
+  data-privacy="/privacy/" data-privacy-label="Privacy"></script>
+```
+
+In the footer, so a visitor can change their mind: `<button type="button" data-consent-open>Cookie settings</button>`.
+
+Put this file at the root as `consent.js`. It keeps the choice in the visitor's browser, loads the waiting tags after Accept, loads nothing after Reject, and reloads the page when someone withdraws consent:
+
+```js
+// Cookie consent for a static site. Nothing that follows visitors loads
+// until they agree: every such tag is written as
+// <script type="text/plain" data-consent ...>, which browsers skip.
+// The texts come from the data-* attributes of the tag that loads this file.
+(function () {
+  var KEY = "consent";
+  var text = document.currentScript.dataset;
+
+  function get() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
+  function set(value) { try { localStorage.setItem(KEY, value); } catch (e) {} }
+
+  function load() {
+    document.querySelectorAll('script[type="text/plain"][data-consent]').forEach(function (waiting) {
+      var script = document.createElement("script");
+      if (waiting.src) script.src = waiting.src; else script.textContent = waiting.textContent;
+      script.async = false;
+      waiting.replaceWith(script);
+    });
+  }
+
+  function ask() {
+    if (document.querySelector(".consent")) return;
+    var box = document.createElement("div");
+    box.className = "consent";
+    box.setAttribute("role", "region");
+    box.setAttribute("aria-label", text.title || "Cookies");
+    var message = document.createElement("p");
+    message.textContent = (text.message || "") + " ";
+    if (text.privacy) {
+      var link = document.createElement("a");
+      link.href = text.privacy;
+      link.textContent = text.privacyLabel || text.privacy;
+      message.appendChild(link);
+    }
+    box.appendChild(message);
+    [["no", text.reject || "Reject"], ["yes", text.accept || "Accept"]].forEach(function (choice) {
+      var button = document.createElement("button");
+      button.type = "button";
+      button.textContent = choice[1];
+      button.addEventListener("click", function () {
+        var before = get();
+        set(choice[0]);
+        box.remove();
+        if (choice[0] === "yes") load();
+        else if (before === "yes") location.reload();
+      });
+      box.appendChild(button);
+    });
+    document.body.appendChild(box);
+  }
+
+  document.addEventListener("click", function (event) {
+    if (event.target.closest("[data-consent-open]")) { event.preventDefault(); ask(); }
+  });
+
+  var choice = get();
+  if (choice === "yes") load();
+  else if (choice !== "no") ask();
+})();
+```
+
+Style the notice in the site's own CSS; both buttons must look equally important:
+
+```css
+.consent { position: fixed; inset: auto 1rem 1rem; z-index: 1000; max-width: 32rem; margin-inline: auto;
+  display: flex; flex-wrap: wrap; gap: .5rem; padding: 1rem; border-radius: .75rem;
+  background: #fff; color: #111; box-shadow: 0 8px 30px rgb(0 0 0 / .2); }
+.consent p { flex: 1 1 100%; margin: 0; }
+.consent button { flex: 1; padding: .6rem 1rem; }
+```
+
+Name every tag on the privacy page: which service, what for, and that it loads only after consent. After publishing, `sites.versions` reports `tracking_without_consent` for a tracker that loads straight away, and `tag_missing_on_page` for a page that lacks a tag the other pages carry.
 
 ## After it is live
 
