@@ -26,6 +26,8 @@ Spaicely hosts what you upload, as it is. Whatever a good site needs beyond its 
 | `site.webmanifest` | Name, colours and icons (192 and 512 px) when someone adds the site to their home screen. |
 | `og.jpg` | The picture for link previews, 1200x630, under 300 KB. A page can have its own. |
 
+If `robots.txt`, `sitemap.xml` or `llms.txt` is missing, Spaicely makes a plain one from the pages when publishing (the sitemap only once a domain is connected) and `sites.versions` reports `made_robots_txt`, `made_sitemap` or `made_llms_txt`. That is a safety net: make them yourself, and your file always wins.
+
 `robots.txt`:
 
 ```
