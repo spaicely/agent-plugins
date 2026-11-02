@@ -28,6 +28,8 @@ Spaicely hosts what you upload, as it is. Whatever a good site needs beyond its 
 
 If `robots.txt`, `sitemap.xml` or `llms.txt` is missing, Spaicely makes a plain one from the pages when publishing (the sitemap only once a domain is connected) and `sites.versions` reports `made_robots_txt`, `made_sitemap` or `made_llms_txt`. That is a safety net: make them yourself, and your file always wins.
 
+For parts many sites need (a cookie notice, forms that stay on the page, videos and maps that load only after a click) there are building blocks: `blocks.list` names them, `blocks.get` gives one with its files, an HTML snippet and notes. Use them instead of writing the same yourself. Pass a block's `deploy_files` along in `sites.deploy`: Spaicely fetches the files and the site gets its own copy on its own domain. Without MCP they are at https://spaicely.com/blocks/index.json.
+
 `robots.txt`:
 
 ```
@@ -189,27 +191,7 @@ A static site can still take messages and signups. Spaicely handles them on `htt
 
    Keep `action`, `method` and the hidden `_hp` field (it catches bots). You may add fields, such as `phone` or `subject`, with any name that does not start with `_`; they all end up in the mail. The field `email` becomes the reply address, so replying goes straight to the visitor. Keep a visible `label` for every field.
 4. **Make the thank-you pages.** `success_url` (after sending) and `confirmed_url` (after confirming a signup) are pages on the site itself, full `https://` addresses on its own domain, with `noindex` and outside the sitemap. Without them the visitor sees a plain page of ours in the form's language with a link back.
-5. **Or stay on the page.** Post with `fetch` and `Accept: application/json`; the answer is `{"ok": true}`, or `{"ok": false, "error": ...}` with `origin_not_allowed`, `form_inactive`, `invalid`, `rate_limited` or `failed`. Without JavaScript the plain form keeps working:
-
-```html
-<script>
-  for (const form of document.querySelectorAll('form[action^="https://scripts.spaicely.com/"]')) {
-    const status = document.createElement("p");
-    status.className = "form-status";
-    status.setAttribute("role", "status");
-    form.append(status);
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const response = await fetch(form.action, {
-        method: "POST", body: new URLSearchParams(new FormData(form)), headers: { Accept: "application/json" }
-      }).catch(() => null);
-      const answer = response ? await response.json().catch(() => ({})) : {};
-      status.textContent = answer.ok ? "Bedankt, uw bericht is verstuurd." : "Dat lukte niet. Probeer het later nog eens.";
-      if (answer.ok) form.reset();
-    });
-  }
-</script>
-```
+5. **Or stay on the page** with the building block `forms` (`blocks.get`, `name: "forms"`): `forms.js` and `forms.css` in the site, `<script src="/forms.js" defer></script>` before `</body>`. It sends every form that posts to Spaicely without leaving the page and shows the texts you put on the form: `data-success`, `data-error`, `data-sending`, and `data-code` before a coupon code, in the language of the page. Or `data-success-url` for a thank-you page. A download with `delivery: "direct"` starts at once; a paid form or donation goes on to Stripe. Writing it yourself works too: post with `fetch` and `Accept: application/json`; the answer is `{"ok": true}`, or `{"ok": false, "error": ...}` with `origin_not_allowed`, `form_inactive`, `invalid`, `rate_limited` or `failed`. Without JavaScript the plain form keeps working.
 
 **A download in exchange for details** (a guide, white paper or price list): use `kind: "download"`.
 
@@ -345,81 +327,13 @@ Before `</body>` of every page, with texts in the language of the page:
 
 In the footer, so a visitor can change their mind: `<button type="button" data-consent-open>Cookie settings</button>`.
 
-Put this file at the root as `consent.js`. It keeps the choice in the visitor's browser, loads the waiting tags after Accept, loads nothing after Reject, and reloads the page when someone withdraws consent:
-
-```js
-// Cookie consent for a static site. Nothing that follows visitors loads
-// until they agree: every such tag is written as
-// <script type="text/plain" data-consent ...>, which browsers skip.
-// The texts come from the data-* attributes of the tag that loads this file.
-(function () {
-  var KEY = "consent";
-  var text = document.currentScript.dataset;
-
-  function get() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
-  function set(value) { try { localStorage.setItem(KEY, value); } catch (e) {} }
-
-  function load() {
-    document.querySelectorAll('script[type="text/plain"][data-consent]').forEach(function (waiting) {
-      var script = document.createElement("script");
-      if (waiting.src) script.src = waiting.src; else script.textContent = waiting.textContent;
-      script.async = false;
-      waiting.replaceWith(script);
-    });
-  }
-
-  function ask() {
-    if (document.querySelector(".consent")) return;
-    var box = document.createElement("div");
-    box.className = "consent";
-    box.setAttribute("role", "region");
-    box.setAttribute("aria-label", text.title || "Cookies");
-    var message = document.createElement("p");
-    message.textContent = (text.message || "") + " ";
-    if (text.privacy) {
-      var link = document.createElement("a");
-      link.href = text.privacy;
-      link.textContent = text.privacyLabel || text.privacy;
-      message.appendChild(link);
-    }
-    box.appendChild(message);
-    [["no", text.reject || "Reject"], ["yes", text.accept || "Accept"]].forEach(function (choice) {
-      var button = document.createElement("button");
-      button.type = "button";
-      button.textContent = choice[1];
-      button.addEventListener("click", function () {
-        var before = get();
-        set(choice[0]);
-        box.remove();
-        if (choice[0] === "yes") load();
-        else if (before === "yes") location.reload();
-      });
-      box.appendChild(button);
-    });
-    document.body.appendChild(box);
-  }
-
-  document.addEventListener("click", function (event) {
-    if (event.target.closest("[data-consent-open]")) { event.preventDefault(); ask(); }
-  });
-
-  var choice = get();
-  if (choice === "yes") load();
-  else if (choice !== "no") ask();
-})();
-```
-
-Style the notice in the site's own CSS; both buttons must look equally important:
-
-```css
-.consent { position: fixed; inset: auto 1rem 1rem; z-index: 1000; max-width: 32rem; margin-inline: auto;
-  display: flex; flex-wrap: wrap; gap: .5rem; padding: 1rem; border-radius: .75rem;
-  background: #fff; color: #111; box-shadow: 0 8px 30px rgb(0 0 0 / .2); }
-.consent p { flex: 1 1 100%; margin: 0; }
-.consent button { flex: 1; padding: .6rem 1rem; }
-```
+`consent.js` and `consent.css` are the building block `consent`; do not write them yourself. Get it with `blocks.get` (`name: "consent"`) and pass its `deploy_files` along in `sites.deploy`, or put `{ "path": "consent.js", "source_url": "https://spaicely.com/blocks/consent/v1/consent.js" }` in the file list, and `consent.css` likewise. Put `<link rel="stylesheet" href="/consent.css">` in the `<head>` of every page. The block keeps the choice in the visitor's browser, loads the waiting tags after Accept, loads nothing after Reject, and reloads the page when someone withdraws consent. Both buttons look equally important; change the colours with `--consent-bg` and `--consent-ink` in the site's CSS.
 
 Name every tag on the privacy page: which service, what for, and that it loads only after consent. After publishing, `sites.versions` reports `tracking_without_consent` for a tracker that loads straight away, and `tag_missing_on_page` for a page that lacks a tag the other pages carry.
+
+### Videos and maps
+
+A plain YouTube or Google Maps iframe loads Google as soon as the page opens, without consent. Use the building block `embeds`: the video or map loads only when the visitor clicks its button, and until then nothing reaches YouTube, Vimeo, Google or OpenStreetMap. `data-embed` is `youtube`, `vimeo`, `map` (OpenStreetMap, with `data-lat`, `data-lon`, `data-zoom`) or `google-map` (with `data-query`). Set `data-title`, `data-button` and `data-note` (where it comes from) in the language of the page, and keep a plain link in the box for visitors without JavaScript. Do not use a YouTube thumbnail as the picture: that loads Google too; `data-poster` with a picture of the site's own is fine.
 
 ## After it is live
 
