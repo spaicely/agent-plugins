@@ -96,7 +96,7 @@ Each address costs EUR 1.50 a month excl. VAT on the site's plan; Site allows 1,
 ## Keeping an eye on it
 
 - `sites.stats` gives requests, bytes, `not_found` and CDN regions per day, over 7, 30 or 90 days, without cookies. Many `not_found` means broken links: find them and add a redirect or fix the link.
-- `scripts.list` shows the state of every form; `shop.orders` the latest orders.
+- `scripts.list` shows the state of every form; `shop.orders` the orders (`filter: "to_ship"` for what still has to go out), and `shop.orders.ship` marks one as sent with track-and-trace and mails the buyer.
 - Deleting a site (`sites.delete`, owner only, with the name the person typed) takes every version, form and the shop offline for good. The domains stay theirs.
 
 ## Without MCP
