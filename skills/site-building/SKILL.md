@@ -222,6 +222,11 @@ A static site can still take messages and signups. Spaicely handles them on `htt
 - For a progress bar: `fetch(progress_url)` gives `{"raised_cents", "donors", "goal_cents", "ends_at", "open", "donations": [{"name", "message", "at"}]}`, open to any origin and fresh within a minute. Show the bar as a percentage of `goal_cents`, and say clearly on the page what the money is for and that it goes to the owner also when the goal is not reached. The building block `donation` does this already: put the `progress_url` in `data-donation` and the texts in the language of the page.
 - Not for investments, loans or rewards in money; that needs a licence. Gifts in return (a mention, a postcard) are fine.
 
+**Polls**: `kind: "poll"` with `question` and `poll_options` (2 to 12 answers) asks visitors a question with buttons. One vote per browser; voting again changes the vote. `poll_multiple: true` allows more answers, `poll_results` sets who sees the results (`always`, `after_vote`, `after_end`, or `owner`: only in the dashboard and `scripts.list`), `ends_at` closes the poll.
+
+- Put the `html` from the answer in the page and add the building block `poll` (`blocks.get poll`): it votes and shows the results as bars. Put the texts (`data-votes`, `data-thanks`, ...) in the language of the page.
+- An answer you leave unchanged in `scripts.configure` keeps its votes.
+
 Good to know:
 
 - A form only accepts posts from the site's connected domain (and its www). On a preview or a local copy it answers `origin_not_allowed`; test it once the domain is live.
