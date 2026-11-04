@@ -83,7 +83,7 @@ Each address costs EUR 1.50 a month excl. VAT on the site's plan; Site allows 1,
 
 ## Plan, billing and renewals
 
-- **Hosting**: `sites.subscription` shows plan, status and renewal date. With `plan` (`site`, `pro` or `shop`; EUR 9, 19 and 39 a month excl. VAT) it starts hosting, giving a `checkout_url` for the person, or switches plan at once. Without a plan a new site is removed after 14 days. Card, invoices and cancelling are at `portal_url`. Only owners of the paying account.
+- **Hosting**: `sites.subscription` shows plan, status and renewal date. With `plan` (`site`, `pro` or `shop`; EUR 9, 19 and 39 a month excl. VAT, paid a year in advance) it starts hosting, giving a `checkout_url` for the person, or switches plan at once. Without a plan a new site is removed after 14 days. Card, invoices and cancelling are at `portal_url`. Only owners of the paying account.
 - **Billing details**: `account.billing` (business or not, VAT number, address). Every purchase needs them; a VAT number is checked with VIES. `account.invoices` lists our invoices with a link each.
 - **Consumers** (an account that is not a business) must agree that an order starts at once, which limits their right of withdrawal. Pass `start_now: true` only when they said so themselves.
 - **Domains**: renewal is automatic by default, charged 14 days before expiry to the card or mandate the domain was paid with (`domains.auto_renew`; without a saved method the answer has a `setup_url`). `domains.renew` gives a payment link to renew now.
