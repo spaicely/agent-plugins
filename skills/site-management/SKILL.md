@@ -75,11 +75,11 @@ A page can mark blocks that a role may change on its own:
 
 Mail to `info@<domain>` can go on to a mailbox the person already has, such as their Gmail. Answering as `info@` is not possible yet.
 
-1. `mail.forward.enable` on a domain connected to a paid site. It sets MX, verification, DKIM, SPF and DMARC. If the domain already receives mail elsewhere, that stops: the call refuses without `replace_existing_mail: true`, so ask first.
+1. `mail.forward.enable` on a domain whose DNS is at Spaicely, with or without a site. Mail belongs to the domain: it keeps working when the site stops or the domain leaves the site. It sets MX, verification, DKIM, SPF and DMARC. If the domain already receives mail elsewhere, that stops: the call refuses without `replace_existing_mail: true`, so ask first.
 2. `mail.forward.add` with `address` (`info`, or `*` for every address without one of its own) and up to 5 `destinations`. Each new destination gets a confirmation mail; nothing goes there before it is clicked.
 3. `mail.forward.status` shows the addresses, the state of each destination and mail held back as possible spam in the last 30 days; `mail.forward.release` sends one on after all, only when the person recognises it.
 
-Each address costs EUR 1.50 a month excl. VAT on the site's plan; Site allows 1, Pro 5, Shop 10. `mail.forward.remove` and `mail.forward.disable` stop it.
+Each address costs EUR 1.50 a month excl. VAT, a year in advance, on one mail subscription per company for every address on its domains, apart from the hosting plan; at most 10 addresses per domain. When that subscription is not running yet, `mail.forward.add` refuses with a link where an owner or someone with the Finance role starts it; pass that link on. A site that pays nothing (such as a test site of Spaicely's) pays nothing for its domains. `mail.forward.remove` and `mail.forward.disable` stop it.
 
 ## Plan, billing and renewals
 
