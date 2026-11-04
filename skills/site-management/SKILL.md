@@ -87,7 +87,7 @@ A domain can also have its own mailboxes at Spaicely, opened with IMAP in any ma
 
 1. `mail.mailboxes.enable` on a domain whose DNS is at Spaicely. It sets MX, SPF, DKIM, SRV and DMARC. When the domain receives mail elsewhere the call refuses without `replace_existing_mail: true`; when it has forwarding, without `replace_forwarding: true`, and then the forwarding addresses stop. Ask first.
 2. `mail.mailboxes.add` with `address` and optionally `name`. Each mailbox holds 10 GB and costs EUR 3.50 a month excl. VAT on the mail subscription, a year in advance; at most 50 per domain.
-3. The person makes a password for each device on the `url` in the answer. You never see that password; do not ask for it either.
+3. The person makes a password for each device on the `url` in the answer. You never see that password; do not ask for it either. Thunderbird and Outlook find the servers themselves from the address; on an iPhone, iPad or Mac the password page offers a file that sets up the mailbox.
 4. `mail.mailboxes.status` gives the mailboxes, the settings for a mail program and whether MX, SPF, DKIM and DMARC are right.
 
 `mail.spam` switches antispam for the domain. On, what looks like spam goes to the Junk Mail folder; off, everything lands in the inbox. `mail.mailboxes.remove` and `mail.mailboxes.disable` delete the mail for good: name the mailboxes and ask first. Without a paid mail subscription addresses and mailboxes go after 14 days, after warnings by mail.
