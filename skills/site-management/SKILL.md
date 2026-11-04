@@ -81,6 +81,17 @@ Mail to `info@<domain>` can go on to a mailbox the person already has, such as t
 
 Each address costs EUR 1.50 a month excl. VAT, a year in advance, on one mail subscription per company for every address on its domains, apart from the hosting plan; at most 10 addresses per domain. When that subscription is not running yet, `mail.forward.add` refuses with a link where an owner or someone with the Finance role starts it; pass that link on. A site that pays nothing (such as a test site of Spaicely's) pays nothing for its domains. `mail.forward.remove` and `mail.forward.disable` stop it.
 
+## Mailboxes
+
+A domain can also have its own mailboxes at Spaicely, opened with IMAP in any mail program. A domain has forwarding or mailboxes, not both. For now mailboxes only receive; sending from the address is not possible yet, so say that first.
+
+1. `mail.mailboxes.enable` on a domain whose DNS is at Spaicely. It sets MX, SPF, DKIM, SRV and DMARC. When the domain receives mail elsewhere the call refuses without `replace_existing_mail: true`; when it has forwarding, without `replace_forwarding: true`, and then the forwarding addresses stop. Ask first.
+2. `mail.mailboxes.add` with `address` and optionally `name`. Each mailbox holds 10 GB and costs EUR 3.50 a month excl. VAT on the mail subscription, a year in advance; at most 50 per domain.
+3. The person makes a password for each device on the `url` in the answer. You never see that password; do not ask for it either.
+4. `mail.mailboxes.status` gives the mailboxes, the settings for a mail program and whether MX, SPF, DKIM and DMARC are right.
+
+`mail.spam` switches antispam for the domain. On, what looks like spam goes to the Junk Mail folder; off, everything lands in the inbox. `mail.mailboxes.remove` and `mail.mailboxes.disable` delete the mail for good: name the mailboxes and ask first. Without a paid mail subscription addresses and mailboxes go after 14 days, after warnings by mail.
+
 ## Plan, billing and renewals
 
 - **Hosting**: `sites.subscription` shows plan, status and renewal date. With `plan` (`site`, `pro` or `shop`; EUR 9, 19 and 39 a month excl. VAT, paid a year in advance) it starts hosting, giving a `checkout_url` for the person, or switches plan at once. Without a plan a new site is removed after 14 days. Card, invoices and cancelling are at `portal_url`. Only owners of the paying account.
