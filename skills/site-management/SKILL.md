@@ -83,7 +83,7 @@ Each address costs EUR 1.50 a month excl. VAT, a year in advance, on one mail su
 
 ## Mailboxes
 
-A domain can also have its own mailboxes at Spaicely, opened with IMAP in any mail program. A domain has forwarding or mailboxes, not both. For now mailboxes only receive; sending from the address is not possible yet, so say that first.
+A domain can also have its own mailboxes at Spaicely, opened with IMAP in any mail program. A domain has forwarding or mailboxes, not both. Sending works too: through `smtp.spaicely.net`, port 465, with the same password; `mail.mailboxes.status` gives the settings. Each mailbox sends at most 100 messages an hour and 500 a day, so no newsletters or bulk mail.
 
 1. `mail.mailboxes.enable` on a domain whose DNS is at Spaicely. It sets MX, SPF, DKIM, SRV and DMARC. When the domain receives mail elsewhere the call refuses without `replace_existing_mail: true`; when it has forwarding, without `replace_forwarding: true`, and then the forwarding addresses stop. Ask first.
 2. `mail.mailboxes.add` with `address` and optionally `name`. Each mailbox holds 10 GB and costs EUR 3.50 a month excl. VAT on the mail subscription, a year in advance; at most 50 per domain.
