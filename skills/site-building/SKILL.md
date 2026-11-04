@@ -171,6 +171,8 @@ Security headers, caching and CORS go in a file `_headers` at the root: a path o
   Cache-Control: public, max-age=604800
 ```
 
+**In a folder.** `_redirects` and `_headers` may also sit in any folder, as with `.htaccess`. Paths and targets then count from that folder: `/old /new` in `blog/_redirects` sends `/blog/old` to `/blog/new`, and `/*` in `blog/_headers` is that folder with everything below it. Such a file cannot touch an address outside its folder. The root goes first, a path a file higher up already has stays there, and the limits count for the whole site. Use it when a folder has its own rules, or when the person's role only reaches that folder.
+
 - At most 20 paths and 15 headers per path; `/*` is the whole site.
 - Headers that would break the answer (Set-Cookie, Content-Type, Content-Length, Location, ...) are refused, with the line in the hints of the version.
 - Do not set a long Cache-Control on HTML: pages must stay fresh after a publish.
