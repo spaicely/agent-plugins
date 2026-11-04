@@ -1,7 +1,7 @@
 {
   "name": "spaicely",
   "displayName": "Spaicely",
-  "version": "1.7.1",
+  "version": "1.8.0",
   "description": "Build, publish and host static websites on your own domain with Spaicely: the MCP server plus guides for building and running sites and finding a domain name.",
   "author": {
     "name": "Spaicely",
