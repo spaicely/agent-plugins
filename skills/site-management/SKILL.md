@@ -54,7 +54,7 @@ A page can mark blocks that a role may change on its own:
 ## People and roles
 
 - **On the whole account**: `account.members`. Owners handle payment, domains and people; members work on all sites. Invite by e-mail (the link works 7 days).
-- **On one site**: `access.list` shows who has which role; `access.update` gives, changes or (`role: "none"`) removes one. Only the owner. The person needs a Spaicely login with that address.
+- **On one site**: `access.list` shows who has which role; `access.update` gives, changes or (`role: "none"`) removes one. Only the owner. If the person has no login yet, send an invitation with `access.invite`: the email explains the steps and a newcomer only enters a name. With `kind: "payer"` you ask someone (management, say) to pay for the hosting; after their first payment their organisation becomes the payer.
 - Roles: `admin` (everything but owner matters), `maintainer` (all files, forms and DNS), `designer` and `editor` (only what their `rules` allow), `viewer` (reading). `can_publish` lets a maintainer or editor publish.
 - Rules limit a designer or editor to actions on paths, optionally to marked blocks: `[{"actions": ["update"], "paths": ["blog/**", "index.html"], "regions": ["news"]}]`.
 - **Approval** (plans Pro and Shop): someone who may change files but not publish calls `sites.review.request` with a `note`. Whoever may publish gets a mail; approving is `sites.publish`, sending back is `sites.review.reject` with a note. On plan Site the person asks someone who may publish.
