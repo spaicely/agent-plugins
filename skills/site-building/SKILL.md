@@ -147,6 +147,34 @@ When the site comes from another platform, or an address changes, send the old a
 - At most 50 lines; the redirect wins over a file at the same path.
 - The file itself is not published. A line that is wrong shows up with its line number in the hints of the version.
 
+Status **200** is a rewrite: the visitor keeps the address and gets the target file, but only where no file of that name exists. For clean addresses and for an app that runs on one page:
+
+```
+/app/*     /app/index.html   200
+/*         /index.html       200
+```
+
+The target of a rewrite is always a path on the same site. A fallback for every address (`/*`) makes the whole site come through Spaicely instead of straight from the CDN storage, which is slightly slower on the first visit; use it only for a single-page app.
+
+## Response headers
+
+Security headers, caching and CORS go in a file `_headers` at the root: a path on a line of its own, its headers indented below.
+
+```
+/*
+  X-Frame-Options: DENY
+  Strict-Transport-Security: max-age=31536000
+  Referrer-Policy: strict-origin-when-cross-origin
+/fonts/*
+  Access-Control-Allow-Origin: *
+/assets/*
+  Cache-Control: public, max-age=604800
+```
+
+- At most 20 paths and 15 headers per path; `/*` is the whole site.
+- Headers that would break the answer (Set-Cookie, Content-Type, Content-Length, Location, ...) are refused, with the line in the hints of the version.
+- Do not set a long Cache-Control on HTML: pages must stay fresh after a publish.
+
 ## More than one language
 
 - One folder per language, each page with `lang` set and the same structure.

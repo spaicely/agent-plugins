@@ -95,6 +95,18 @@ Each address costs EUR 1.50 a month excl. VAT, a year in advance, on one mail su
 - `sites.handover` mails the customer a link (14 days) to take a finished site onto their own account; `role` is what the partner keeps, `payer` who pays from then on. `sites.handover.revoke` takes it back before acceptance.
 - `domains.propose` proposes a domain for a customer's site; the customer checks the holder details and agrees by mail first.
 
+## Settings at the edge
+
+`sites.settings` (owner or admin) shows and changes what the CDN does with the site; changes work in about half a minute.
+
+- `maintenance: true` shows every page as a maintenance page with status 503, the site's own `maintenance.html` if it has one, else ours with `maintenance_message`. `false` brings the site back; files and versions stay.
+- `protect: {path, username, password}` puts a folder (or `/` for the whole site) behind a name and password; `unprotect: "/folder/"` takes it away. Ask the person for the password, never make one up.
+- `access_mode` `block` keeps out `access_countries` (two-letter codes) and `access_ips` (addresses or ranges such as 198.51.100.0/24); `allow` lets only them in; `open` is everyone.
+- `hotlink_protection: true` stops other sites from embedding the site's images, video and documents.
+- `prefer_www: true` makes www the main address; the bare domain then sends visitors on, and the other way round with `false`.
+- `sites.cache.purge` empties the cache for up to 20 paths (`/img/*` for a folder). Publishing already empties everything, so this is rarely needed.
+- Redirects, rewrites and headers are not settings but files of the site: `_redirects` and `_headers` (see the site-building skill).
+
 ## Keeping an eye on it
 
 - `sites.stats` gives requests, bytes, `not_found` and CDN regions per day, over 7, 30 or 90 days, without cookies. Many `not_found` means broken links: find them and add a redirect or fix the link.
