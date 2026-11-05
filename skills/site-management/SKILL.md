@@ -119,7 +119,8 @@ The owner of the company can switch reading by AI off per domain, and the person
 
 ## Partners
 
-- A partner (a web designer or agency) builds on its own partner account, or works on the customer's site with a role.
+- A partner (a web designer or agency) builds on its own partner account with `sites.create`, or works with a role on the customer's site. A site on a partner account can have a domain.
+- `access.invite` with kind `payer` asks the customer to pay. After the first payment the customer owns the site and its domains and the partner stays on as admin; with `becomes_owner: false` the site stays with the partner and the customer only pays. Left out, the partner's own setting decides (partner page of the company). Only an owner of the partner can give a site away.
 - `sites.handover` mails the customer a link (14 days) to take a finished site onto their own account; `role` is what the partner keeps, `payer` who pays from then on. `sites.handover.revoke` takes it back before acceptance.
 - `domains.propose` proposes a domain for a customer's site; the customer checks the holder details and agrees by mail first.
 
