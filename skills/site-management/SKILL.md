@@ -10,6 +10,7 @@ How a site gets online and stays there. For what a good site contains, see the s
 ## Start
 
 - Call `account.whoami` first. It says who you act for, your scopes, and per site your role and what you may do. With no site yet, `sites.create` makes one; ask the person for the name.
+- One connection can cover several companies of the person: `companies` in `account.whoami` lists them, `default` marks the one a call acts for without more. A call about a site acts for that site's company by itself; every other call (a new site, a domain, mail, billing) takes `account_id`. Choose it per call, nothing is remembered. A company that is not listed needs the person to connect again and tick it.
 - Your rights are never wider than the person's role. When a tool refuses, say what is missing (role, scope or plan) instead of trying another way.
 - A tool named here that is not in your list means your list is old: ask the person to reconnect the Spaicely connector (in claude.ai: Settings > Connectors; in Claude Code: `/mcp`).
 - Ask the person before anything that changes what visitors see, costs money or cannot be undone. Some tools ask for approval themselves in Claude Code.
