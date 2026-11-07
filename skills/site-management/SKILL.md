@@ -96,10 +96,11 @@ A domain can also have its own mailboxes at Spaicely, opened with IMAP in any ma
 
 ## Reading a mailbox
 
-You can read mail for the person, and nothing else: no sending, moving or deleting, and a mail you read stays unread.
+You can read mail for the person and prepare replies as drafts. You cannot send, move or delete anything, and a mail you read stays unread.
 
 1. `mail.readable` lists what you may read. With nothing yet it gives `request_url`: give the person that link. They choose mailboxes there and confirm with their passkey. Never say this can be done by mail, and do not try to do it for them.
 2. `mail.messages.list` finds mail (`query`, `from`, `since`, `unread`, `folder`), `mail.messages.get` opens one by `id`. With more than one mailbox, pass `mailbox`.
+3. `mail.drafts.create` puts a draft in that mailbox's Drafts folder (`to`, `subject`, `text`, and `reply_to` with the `id` of the mail you answer). The person reads it and sends it themselves. `mail.drafts.list` lists your drafts, `mail.drafts.update` changes one or throws it away (`remove: true`); drafts the person wrote themselves stay as they are. When drafts are off for that mailbox, say so and give the text in the conversation.
 
 Someone with a mailbox and no Spaicely account connects you to the same MCP address and chooses "Sign in with your mailbox"; you then see only that mailbox and only these tools.
 
