@@ -354,7 +354,7 @@ A person who has a site elsewhere can have you rebuild it here: the same pages a
 
 ### Analytics and other tags
 
-Ask first whether the person needs them. `sites.stats` already counts requests per day without cookies; that is not visitor analytics, but for many small sites it is enough. If they want Google Analytics, Google Tag Manager, a Meta, LinkedIn or TikTok pixel, Hotjar or Clarity, ask for the ID (`G-...`, `GTM-...`, the pixel number); never make one up.
+Ask first whether the person needs them. `sites.stats` already gives visitors, page views, sources, countries and devices per day without cookies, and the owner sees them as a chart in the dashboard; for most small sites that is enough. If they want Google Analytics, Google Tag Manager, a Meta, LinkedIn or TikTok pixel, Hotjar or Clarity, ask for the ID (`G-...`, `GTM-...`, the pixel number); never make one up.
 
 Spaicely does not add anything to your pages. A static site has no shared template, so:
 
