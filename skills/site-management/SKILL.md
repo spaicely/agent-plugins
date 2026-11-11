@@ -142,7 +142,7 @@ The owner of the company can switch reading by AI off per domain, and the person
 
 ## Keeping an eye on it
 
-- `sites.stats` gives visitors, page views and how often an AI read the site, per day over 7, 30, 90 or 365 days, with the most viewed pages, where visitors came from, countries, devices and `missing_pages`, without cookies and without robots. The owner sees the same as a chart on the site's Visits tab. Anything in `missing_pages` means people follow a link to a page that does not exist: add a redirect in `_redirects` or fix the link.
+- `sites.stats` gives visitors, page views and how often an AI read the site, per day over 7, 30, 90 or 365 days, with the most viewed pages, where visitors came from, countries, devices and `missing_pages`, without cookies and without robots. `ai_agents` says per AI company why it read (`uses`: `user` because someone asked, `search` for its own search engine, `training` to train a model), `search_engines` which search engines read and `link_previews` which apps fetched a shared link. The same JSON is at `GET https://app.spaicely.com/api/sites/<site_id>/stats` with the token as Bearer. The owner sees the same as a chart on the site's Visits tab. Anything in `missing_pages` means people follow a link to a page that does not exist: add a redirect in `_redirects` or fix the link.
 - `scripts.list` shows the state of every form; `shop.orders` the orders (`filter: "to_ship"` for what still has to go out), and `shop.orders.ship` marks one as sent with track-and-trace and mails the buyer.
 - Deleting a site (`sites.delete`, owner only, with the name the person typed) takes every version, form and the shop offline for good. The domains stay theirs.
 
