@@ -28,6 +28,10 @@ What the statuses mean:
 
 The first check is quick and looks at DNS only. When the user likes a few names, check those deeply: `domains.search` with `verify: true`, or `GET https://app.spaicely.com/api/domains/verify/<names>/<extensions>` (at most 10 domains; the quick answer has a ready-made `verify_url`). That also asks the registry.
 
+## Prices
+
+`domains.prices` (same public server) or `GET https://app.spaicely.com/api/domains/prices/nl,com,eu/de` gives what registering, renewing and moving a domain costs per extension: the price for the whole term paid up front (`months`, 12 for most, 24 for .ai) and `per_year`. Prices are before VAT. The last part of the path is optional: a currency (`eur`, `gbp`, `usd`) or the user's country in two letters, which picks the currency and adds `price_incl_vat` for a consumer there. Without extensions you get the whole list; filter with `kind` (`country` or `generic`), `max_per_year` and `sort` (`register` or `renew`, cheapest first). A business pays the price before VAT, a consumer the price with VAT. A premium name costs more than the list: the search says so per name. When price matters to the user, look it up before you suggest extensions, and name the yearly renewal too, not only the first year.
+
 ## How to brainstorm
 
 1. If the description is thin, ask at most two short questions: where, for whom, what tone. Otherwise start.
