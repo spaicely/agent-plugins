@@ -177,6 +177,39 @@ Security headers, caching and CORS go in a file `_headers` at the root: a path o
 - Headers that would break the answer (Set-Cookie, Content-Type, Content-Length, Location, ...) are refused, with the line in the hints of the version.
 - Do not set a long Cache-Control on HTML: pages must stay fresh after a publish.
 
+## Pages that go live later, and a list that keeps itself
+
+A blog post, an announcement or a page for a launch can go along with a version now and come out by itself later. Put the time in the head of that page:
+
+```html
+<meta name="spaicely:publish-at" content="2026-11-20T09:00+01:00">
+```
+
+- Until that time the page is not online (visitors get the 404), and it is left out of every list, of feed.xml, of sitemap.xml and of llms.txt. At the time it comes out, within a minute or two, and those files are brought up to date along with it. No second publish is needed.
+- Give the time with its offset (`+01:00`, `Z`). A time without one counts as Amsterdam time. A time we cannot read keeps the page back too, with a hint saying why.
+- The hints of the version name each waiting page and its time; sites.versions gives `scheduled` in the report and `next_page_at`.
+- A suggestion preview (`_preview/`) shows waiting pages already, so the person can read the post before it is out.
+
+**A list of the pages in a folder.** On the overview page, write one example item between two markers. Spaicely repeats it for every page in that folder that is out, newest first, and removes the markers:
+
+```html
+<!-- spaicely:list blog/ limit=10 -->
+<article>
+  <a data-field="url"><h2 data-field="title">Example title</h2></a>
+  <time data-field="date"></time>
+  <p data-field="description">Example summary</p>
+  <img data-field="image" alt="">
+</article>
+<!-- /spaicely:list -->
+```
+
+- The folder comes first (`/` for the whole site), then optionally `limit=` (default 20, at most 200) and `order=oldest`.
+- Fields: `url` (the `href` on an `<a>`, else the text), `title` (og:title, else `<title>`), `description` (meta description, else og:description), `image` (og:image, as `src` with the title as alt), `date` (publish-at, else article:published_time, else the first `<time datetime>` on the page; written out in the language of the page, `data-format="%d-%m-%Y"` for your own). An element whose field is empty is left out, so a post without an image gets no empty `<img>`. Any `<a data-link>` in the item gets the address of the page.
+- Left out of the list: the folder's own index.html, 404.html, pages with a list of their own, pages with `noindex`, and pages that wait.
+- Style the item as part of the site; the example text in it is never shown.
+- With a connected domain, the folder also gets an RSS feed at `blog/feed.xml` (50 newest), and the list page a `<link rel="alternate" type="application/rss+xml">` to it. A feed.xml of your own at that path wins.
+- So never add a new post to the overview or sitemap by hand: put the page in the folder, with its title, description, og:image and, if it should wait, its publish-at.
+
 ## More than one language
 
 - One folder per language, each page with `lang` set and the same structure.
